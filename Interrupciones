@@ -78,6 +78,16 @@ void setup(){
  digitalWrite(bot3, LOW);
 }
 void loop(){
+//Establecemos como interactuan las variables con los botones
+ suma = digitalRead(bot1);
+ resta = digitalRead(bot2);
+ R = digitalRead(bot3);
+
+ if (contador_B==contador_T){
+  digitalWrite(LEDR, HIGH);
+  delay(150);
+  digitalWrite(LEDR,LOW);
+ 
 
 }
 
