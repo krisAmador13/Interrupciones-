@@ -14,6 +14,10 @@
 #define bot1= 17
 #define bot2= 28
 #define bot3=19
+//Establecemos el estado inicial de botones 
+bool p_bot1 = LOW;
+bool p_bot2 = LOW;
+bool p_bot3 = LOW;
 //Contadores para timer y botones 
 uint8_t contador_B 
 uint8_t contador_T
@@ -35,6 +39,19 @@ unsigned long t_rebote_bot3 = 60;
 void initTimer0();
 void IRAM_ATTR Timer0_ISR();
 //Declaración de funciones de botones 
+void IRAM_ATTR B1_ISR();
+void IRAM_ATTR B2_ISR();
+void IRAM_ATTR B3_ISR();
+
+void setup(){
+//iniciación del timer 
+ initTimer0();
+//Iniciación de interrupción de botones 
+ attachInterrupt(bot1, B1_ISR, CHANGE);
+ attachInterrupt(bot2, B2_ISR, CHANGE);
+ attachInterrupt(bot3, B3_ISR, CHANGE);
+}
+
 
 
 //Función que establece el timer 
@@ -88,13 +105,11 @@ portExit_Critical_ISR(&mux);//Salimos de la sección crítica
 //Establecemos función de acción del boton de reinicio de contador de timer 
 void IRAM_ATTR B3_ISR(){
 unsigned long t_actual = esp_timer_get_time() / 1000; //esp_timer_get_time() devuelve el tiempo actual en microsegundos desde que el microcontrolador comenzó a ejecutarse
-if ((t_actual - bot2_lF) > t_rebote) {
+if ((t_actual - bot3_lF) > t_rebote) {
  portEnter_Critical_ISR(&mux);//Entramos a la sección crítica
- if (contador_B > 0) {
-      contador_B--;
- }
+      contador_T=0;
 }
-unsigned long bot1_lF= t_actual;
+unsigned long bot3_lF= t_actual;
 portExit_Critical_ISR(&mux);//Salimos de la sección crítica 
 }
 
