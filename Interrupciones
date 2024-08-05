@@ -10,14 +10,11 @@
 #define LED6 35
 #define LED7 32
 #define LED8 33
+#define LEDR 13
 //Definimos los botones y el contador
 #define bot1= 17
 #define bot2= 28
 #define bot3=19
-//Establecemos el estado inicial de botones 
-bool p_bot1 = LOW;
-bool p_bot2 = LOW;
-bool p_bot3 = LOW;
 //Contadores para timer y botones 
 uint8_t contador_B 
 uint8_t contador_T
@@ -50,6 +47,38 @@ void setup(){
  attachInterrupt(bot1, B1_ISR, CHANGE);
  attachInterrupt(bot2, B2_ISR, CHANGE);
  attachInterrupt(bot3, B3_ISR, CHANGE);
+//Establecemos los pines como salidas o entradas 
+ pinMode(LED1, OUPUT);
+ pinMode(LED2, OUPUT);
+ pinMode(LED3, OUPUT);
+ pinMode(LED4, OUPUT);
+ pinMode(LED5, OUPUT);
+ pinMode(LED6, OUPUT);
+ pinMode(LED7, OUPUT);
+ pinMode(LED8, OUPUT);
+ pinMode(LEDR, OUPUT);
+
+ pinMode(bot1, INPUT, PULLDOWN);
+ pinMode(bot2, INPUT, PULLDOWN);
+ pinMode(bot3, INPUT, PULLDOWN);
+
+//Establecemos si los elementos se encuentran en HIGH o LOW
+ digitalWrite(LED1, LOW);
+ digitalWrite(LED2, LOW);
+ digitalWrite(LED3, LOW);
+ digitalWrite(LED4, LOW);
+ digitalWrite(LED5, LOW);
+ digitalWrite(LED6, LOW);
+ digitalWrite(LED7, LOW);
+ digitalWrite(LED8, LOW);
+ digitalWrite(LEDR, LOW);
+
+ digitalWrite(bot1, LOW);
+ digitalWrite(bot2, LOW);
+ digitalWrite(bot3, LOW);
+}
+void loop(){
+
 }
 
 
