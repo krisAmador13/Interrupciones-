@@ -31,8 +31,11 @@ unsigned long bot3_lF=0;
 unsigned long t_rebote_bot1 = 60; 
 unsigned long t_rebote_bot2 = 60; 
 unsigned long t_rebote_bot3 = 60; 
-//Declaración de funciones 
+//Declaración de funciones de timer
 void initTimer0();
+void IRAM_ATTR Timer0_ISR();
+//Declaración de funciones de botones 
+
 
 //Función que establece el timer 
 void initTimer0(){
@@ -44,8 +47,10 @@ void initTimer0(){
  timerAlarmWrite(Timer0, 25000, false);
  //Habilitamos el timer
  timerAlarmEnable(Timer0);
+ void IRAM_ATTR B1_ISR();
 
-void IRAM_ATTR Timer0_ISR(){//Hacer que incremente y decremente el contador
+//Hacer que incremente y decremente el contador
+void IRAM_ATTR Timer0_ISR(){
     contador++;
     if (contador > 15) {
     contador = 0;
@@ -54,6 +59,42 @@ void IRAM_ATTR Timer0_ISR(){//Hacer que incremente y decremente el contador
     }
   
 }
-
-
+//Establecemos interrupciones de botón 
+//Establecemos función de acción del boton de suma
+void IRAM_ATTR B1_ISR(){
+unsigned long t_actual = esp_timer_get_time() / 1000; //esp_timer_get_time() devuelve el tiempo actual en microsegundos desde que el microcontrolador comenzó a ejecutarse
+if ((t_actual - bot1_lF) > t_rebote) {
+ portEnter_Critical_ISR(&mux);//Entramos a la sección crítica
+ contador_B++;
+ if (contador_B > 15) {
+      contadorBot = 0;
+ }
+}
+unsigned long bot1_lF= t_actual; 
+portExit_Critical_ISR(&mux);//Salimos de la sección crítica 
+}
+//Establecemos función de acción del boton de resta
+void IRAM_ATTR B2_ISR(){
+unsigned long t_actual = esp_timer_get_time() / 1000; //esp_timer_get_time() devuelve el tiempo actual en microsegundos desde que el microcontrolador comenzó a ejecutarse
+if ((t_actual - bot2_lF) > t_rebote) {
+ portEnter_Critical_ISR(&mux);//Entramos a la sección crítica
+ if (contador_B > 0) {
+      contador_B--;
+ }
+}
+unsigned long bot2_lF= t_actual;
+portExit_Critical_ISR(&mux);//Salimos de la sección crítica 
+}
+//Establecemos función de acción del boton de reinicio de contador de timer 
+void IRAM_ATTR B3_ISR(){
+unsigned long t_actual = esp_timer_get_time() / 1000; //esp_timer_get_time() devuelve el tiempo actual en microsegundos desde que el microcontrolador comenzó a ejecutarse
+if ((t_actual - bot2_lF) > t_rebote) {
+ portEnter_Critical_ISR(&mux);//Entramos a la sección crítica
+ if (contador_B > 0) {
+      contador_B--;
+ }
+}
+unsigned long bot1_lF= t_actual;
+portExit_Critical_ISR(&mux);//Salimos de la sección crítica 
+}
 
