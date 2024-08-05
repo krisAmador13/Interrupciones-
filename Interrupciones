@@ -1,0 +1,17 @@
+#include <Arduino.h>
+#include<stdint.h>
+
+//Definición de variables específicas
+#define LED1 25
+#define LED2 26
+#define LED3 27
+#define LED4 14
+#define LED5 34
+#define LED6 35
+#define LED7 32
+#define LED8 33
+//Definimos los botones y el contador
+#define bot1= 17
+#define bot2= 28
+#define bot3=19
+int contador = 0;
