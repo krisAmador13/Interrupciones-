@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include<stdint.h>
 
-//Definición de variables específicas
+//Definición de variables globales 
 #define LED1 25
 #define LED2 26
 #define LED3 27
@@ -14,4 +14,46 @@
 #define bot1= 17
 #define bot2= 28
 #define bot3=19
-int contador = 0;
+//Contadores para timer y botones 
+uint8_t contador_B 
+uint8_t contador_T
+
+//Declaración de variables volátiles 
+volatile int R; //Se establece la variable de reinicio 
+volatile int suma; // Relacionada con el incremento del contador 
+volatile int resta; //Relacionada con la disminución del contador 
+
+//Variables para evitar el rebote de los botones 
+unsigned long bot1_lF=0;
+unsigned long bot2_lF=0;
+unsigned long bot3_lF=0;
+//Se establece el tiempo necesario entre pulsaciones para no considerarla un rebote 
+unsigned long t_rebote_bot1 = 60; 
+unsigned long t_rebote_bot2 = 60; 
+unsigned long t_rebote_bot3 = 60; 
+//Declaración de funciones 
+void initTimer0();
+
+//Función que establece el timer 
+void initTimer0(){
+ //Seleccionar número de timer, Prescaler y Flag
+ Timer0= timerBegin(0,80,true);
+ //Definimos función de ISR
+ timerAttachInterrupt(Timer0, &Timer0_ISR, true);
+ //Definimos alarma y reload 
+ timerAlarmWrite(Timer0, 25000, false);
+ //Habilitamos el timer
+ timerAlarmEnable(Timer0);
+
+void IRAM_ATTR Timer0_ISR(){//Hacer que incremente y decremente el contador
+    contador++;
+    if (contador > 15) {
+    contador = 0;
+    } else if (contador < 0) {
+      contador = 0;
+    }
+  
+}
+
+
+
