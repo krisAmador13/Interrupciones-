@@ -48,15 +48,15 @@ void setup(){
  attachInterrupt(bot2, B2_ISR, CHANGE);
  attachInterrupt(bot3, B3_ISR, CHANGE);
 //Establecemos los pines como salidas o entradas 
- pinMode(LED1, OUPUT);
- pinMode(LED2, OUPUT);
- pinMode(LED3, OUPUT);
- pinMode(LED4, OUPUT);
- pinMode(LED5, OUPUT);
- pinMode(LED6, OUPUT);
- pinMode(LED7, OUPUT);
- pinMode(LED8, OUPUT);
- pinMode(LEDR, OUPUT);
+ pinMode(LED1, OUTPUT);
+ pinMode(LED2, OUTPUT);
+ pinMode(LED3, OUTPUT);
+ pinMode(LED4, OUTPUT);
+ pinMode(LED5, OUTPUT);
+ pinMode(LED6, OUTPUT);
+ pinMode(LED7, OUTPUT);
+ pinMode(LED8, OUTPUT);
+ pinMode(LEDR, OUTPUT);
 
  pinMode(bot1, INPUT, PULLDOWN);
  pinMode(bot2, INPUT, PULLDOWN);
