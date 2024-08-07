@@ -2,22 +2,26 @@
 #include<stdint.h>
 
 //Definición de variables globales 
-#define LED1 25
-#define LED2 26
-#define LED3 27
-#define LED4 14
-#define LED5 34
-#define LED6 35
-#define LED7 32
-#define LED8 33
-#define LEDR 13
+#define LED1 32
+#define LED2 33
+#define LED3 26
+#define LED4 27
+#define LED5 23
+#define LED6 22
+#define LED7 14
+#define LED8 21
+#define LEDR 19
 //Definimos los botones y el contador
-#define bot1= 17
-#define bot2= 28
-#define bot3=19
+#define bot1 13
+#define bot2 25
+#define bot3 12
 //Contadores para timer y botones 
-uint8_t contador_B 
-uint8_t contador_T
+uint8_t contador_B;
+uint8_t contador_T;
+
+portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+
+hw_timer_t *timer0 = NULL;
 
 //Declaración de variables volátiles 
 volatile int R; //Se establece la variable de reinicio 
@@ -41,70 +45,261 @@ void IRAM_ATTR B2_ISR();
 void IRAM_ATTR B3_ISR();
 
 void setup(){
-//iniciación del timer 
- initTimer0();
-//Iniciación de interrupción de botones 
- attachInterrupt(bot1, B1_ISR, CHANGE);
- attachInterrupt(bot2, B2_ISR, CHANGE);
- attachInterrupt(bot3, B3_ISR, CHANGE);
-//Establecemos los pines como salidas o entradas 
- pinMode(LED1, OUTPUT);
- pinMode(LED2, OUTPUT);
- pinMode(LED3, OUTPUT);
- pinMode(LED4, OUTPUT);
- pinMode(LED5, OUTPUT);
- pinMode(LED6, OUTPUT);
- pinMode(LED7, OUTPUT);
- pinMode(LED8, OUTPUT);
- pinMode(LEDR, OUTPUT);
+  //iniciación del timer 
+  initTimer0();
+  //Iniciación de interrupción de botones 
+  attachInterrupt(bot1, B1_ISR, CHANGE);
+  attachInterrupt(bot2, B2_ISR, CHANGE);
+  attachInterrupt(bot3, B3_ISR, CHANGE);
+  //Establecemos los pines como salidas o entradas 
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+  pinMode(LED3, OUTPUT);
+  pinMode(LED4, OUTPUT);
+  pinMode(LED5, OUTPUT);
+  pinMode(LED6, OUTPUT);
+  pinMode(LED7, OUTPUT);
+  pinMode(LED8, OUTPUT);
+  pinMode(LEDR, OUTPUT);
 
- pinMode(bot1, INPUT, PULLDOWN);
- pinMode(bot2, INPUT, PULLDOWN);
- pinMode(bot3, INPUT, PULLDOWN);
+  pinMode(bot1, INPUT_PULLDOWN);
+  pinMode(bot2, INPUT_PULLDOWN);
+  pinMode(bot3, INPUT_PULLDOWN);
 
-//Establecemos si los elementos se encuentran en HIGH o LOW
- digitalWrite(LED1, LOW);
- digitalWrite(LED2, LOW);
- digitalWrite(LED3, LOW);
- digitalWrite(LED4, LOW);
- digitalWrite(LED5, LOW);
- digitalWrite(LED6, LOW);
- digitalWrite(LED7, LOW);
- digitalWrite(LED8, LOW);
- digitalWrite(LEDR, LOW);
-
- digitalWrite(bot1, LOW);
- digitalWrite(bot2, LOW);
- digitalWrite(bot3, LOW);
+  //Establecemos si los elementos se encuentran en HIGH o LOW
+  digitalWrite(LED1, LOW);
+  digitalWrite(LED2, LOW);
+  digitalWrite(LED3, LOW);
+  digitalWrite(LED4, LOW);
+  digitalWrite(LED5, LOW);
+  digitalWrite(LED6, LOW);
+  digitalWrite(LED7, LOW);
+  digitalWrite(LED8, LOW);
+  digitalWrite(LEDR, LOW);
+  digitalWrite(bot1, LOW);
+  digitalWrite(bot2, LOW);
+  digitalWrite(bot3, LOW);
 }
 void loop(){
-//Establecemos como interactuan las variables con los botones
- suma = digitalRead(bot1);
- resta = digitalRead(bot2);
- R = digitalRead(bot3);
-
- if (contador_B==contador_T){
-  digitalWrite(LEDR, HIGH);
-  delay(150);
-  digitalWrite(LEDR,LOW);
- 
-
+  //Establecemos como interactuan las variables con los botones
+  suma = digitalRead(bot1);
+  resta = digitalRead(bot2);
+  R = digitalRead(bot3);
+  //establecemos la lógica para las leds del contador manual
+  if(contador_B == 0){
+    digitalWrite(LED1, LOW);
+    digitalWrite(LED2, LOW);
+    digitalWrite(LED3, LOW);
+    digitalWrite(LED4, LOW);
+  }
+  else if(contador_B == 1){
+    digitalWrite(LED1, HIGH);
+    digitalWrite(LED2, LOW);
+    digitalWrite(LED3, LOW);
+    digitalWrite(LED4, LOW);
+  }
+  else if(contador_B == 2){
+    digitalWrite(LED1, LOW);
+    digitalWrite(LED2, HIGH);
+    digitalWrite(LED3, LOW);
+    digitalWrite(LED4, LOW);
+  }
+  else if(contador_B == 3){
+    digitalWrite(LED1, HIGH);
+    digitalWrite(LED2, HIGH);
+    digitalWrite(LED3, LOW);
+    digitalWrite(LED4, LOW);
+  }
+  else if(contador_B == 4){
+    digitalWrite(LED1, LOW);
+    digitalWrite(LED2, LOW);
+    digitalWrite(LED3, HIGH);
+    digitalWrite(LED4, LOW);
+  }
+  else if(contador_B == 5){
+    digitalWrite(LED1, HIGH);
+    digitalWrite(LED2, LOW);
+    digitalWrite(LED3, HIGH);
+    digitalWrite(LED4, LOW);
+  }
+  else if(contador_B == 6){
+    digitalWrite(LED1, LOW);
+    digitalWrite(LED2, HIGH);
+    digitalWrite(LED3, HIGH);
+    digitalWrite(LED4, LOW);
+  }
+  else if(contador_B == 7){
+    digitalWrite(LED1, HIGH);
+    digitalWrite(LED2, HIGH);
+    digitalWrite(LED3, HIGH);
+    digitalWrite(LED4, LOW);
+  }
+  else if(contador_B == 8){
+    digitalWrite(LED1, LOW);
+    digitalWrite(LED2, LOW);
+    digitalWrite(LED3, LOW);
+    digitalWrite(LED4, HIGH);
+  }
+  else if(contador_B == 9){
+    digitalWrite(LED1, HIGH);
+    digitalWrite(LED2, LOW);
+    digitalWrite(LED3, LOW);
+    digitalWrite(LED4, HIGH);
+  }
+  else if(contador_B == 10){
+    digitalWrite(LED1, LOW);
+    digitalWrite(LED2, HIGH);
+    digitalWrite(LED3, LOW);
+    digitalWrite(LED4, HIGH);
+  }
+  else if(contador_B == 11){
+    digitalWrite(LED1, HIGH);
+    digitalWrite(LED2, HIGH);
+    digitalWrite(LED3, LOW);
+    digitalWrite(LED4, HIGH);
+  }
+  else if(contador_B == 12){
+    digitalWrite(LED1, LOW);
+    digitalWrite(LED2, LOW);
+    digitalWrite(LED3, HIGH);
+    digitalWrite(LED4, HIGH);
+  }
+  else if(contador_B == 13){
+    digitalWrite(LED1, HIGH);
+    digitalWrite(LED2, LOW);
+    digitalWrite(LED3, HIGH);
+    digitalWrite(LED4, HIGH);
+  }
+  else if(contador_B == 14){
+    digitalWrite(LED1, LOW);
+    digitalWrite(LED2, HIGH);
+    digitalWrite(LED3, HIGH);
+    digitalWrite(LED4, HIGH);
+  }
+  else if(contador_B == 15){
+    digitalWrite(LED1, HIGH);
+    digitalWrite(LED2, HIGH);
+    digitalWrite(LED3, HIGH);
+    digitalWrite(LED4, HIGH);
+  }
+//establecemos lógica para los leds controlados por el timer interno. 
+  if(contador_T == 0){
+    digitalWrite(LED5, LOW);
+    digitalWrite(LED6, LOW);
+    digitalWrite(LED7, LOW);
+    digitalWrite(LED8, LOW);
+  }
+  else if(contador_T == 1){
+    digitalWrite(LED5, HIGH);
+    digitalWrite(LED6, LOW);
+    digitalWrite(LED7, LOW);
+    digitalWrite(LED8, LOW);
+  }
+  else if(contador_T == 2){
+    digitalWrite(LED5, LOW);
+    digitalWrite(LED6, HIGH);
+    digitalWrite(LED7, LOW);
+    digitalWrite(LED8, LOW);
+  }
+  else if(contador_T == 3){
+    digitalWrite(LED5, HIGH);
+    digitalWrite(LED6, HIGH);
+    digitalWrite(LED7, LOW);
+    digitalWrite(LED8, LOW);
+  }
+  else if(contador_T == 4){
+    digitalWrite(LED5, LOW);
+    digitalWrite(LED6, LOW);
+    digitalWrite(LED7, HIGH);
+    digitalWrite(LED8, LOW);
+  }
+  else if(contador_T == 5){
+    digitalWrite(LED5, HIGH);
+    digitalWrite(LED6, LOW);
+    digitalWrite(LED7, HIGH);
+    digitalWrite(LED8, LOW);
+  }
+  else if(contador_T == 6){
+    digitalWrite(LED5, LOW);
+    digitalWrite(LED6, HIGH);
+    digitalWrite(LED7, HIGH);
+    digitalWrite(LED8, LOW);
+  }
+  else if(contador_T == 7){
+    digitalWrite(LED5, HIGH);
+    digitalWrite(LED6, HIGH);
+    digitalWrite(LED7, HIGH);
+    digitalWrite(LED8, LOW);
+  }
+  else if(contador_T == 8){
+    digitalWrite(LED5, LOW);
+    digitalWrite(LED6, LOW);
+    digitalWrite(LED7, LOW);
+    digitalWrite(LED8, HIGH);
+  }
+  else if(contador_T == 9){
+    digitalWrite(LED5, HIGH);
+    digitalWrite(LED6, LOW);
+    digitalWrite(LED7, LOW);
+    digitalWrite(LED8, HIGH);
+  }
+  else if(contador_T == 10){
+    digitalWrite(LED5, LOW);
+    digitalWrite(LED6, HIGH);
+    digitalWrite(LED7, LOW);
+    digitalWrite(LED8, HIGH);
+  }
+  else if(contador_T == 11){
+    digitalWrite(LED5, HIGH);
+    digitalWrite(LED6, HIGH);
+    digitalWrite(LED7, LOW);
+    digitalWrite(LED8, HIGH);
+  }
+  else if(contador_T == 12){
+    digitalWrite(LED5, LOW);
+    digitalWrite(LED6, LOW);
+    digitalWrite(LED7, HIGH);
+    digitalWrite(LED8, HIGH);
+  }
+  else if(contador_T == 13){
+    digitalWrite(LED5, HIGH);
+    digitalWrite(LED6, LOW);
+    digitalWrite(LED7, HIGH);
+    digitalWrite(LED8, HIGH);
+  }
+  else if(contador_T == 14){
+    digitalWrite(LED5, LOW);
+    digitalWrite(LED6, HIGH);
+    digitalWrite(LED7, HIGH);
+    digitalWrite(LED8, HIGH);
+  }
+  else if(contador_T == 15){
+    digitalWrite(LED5, HIGH);
+    digitalWrite(LED6, HIGH);
+    digitalWrite(LED7, HIGH);
+    digitalWrite(LED8, HIGH);
+  }
+  if (contador_B==contador_T){
+    digitalWrite(LEDR, HIGH);
+    delay(150);
+    digitalWrite(LEDR,LOW);
+  }
 }
 
 
 
 //Función que establece el timer 
 void initTimer0(){
- //Seleccionar número de timer, Prescaler y Flag
- Timer0= timerBegin(0,80,true);
- //Definimos función de ISR
- timerAttachInterrupt(Timer0, &Timer0_ISR, true);
- //Definimos alarma y reload 
- timerAlarmWrite(Timer0, 25000, false);
- //Habilitamos el timer
- timerAlarmEnable(Timer0);
- void IRAM_ATTR B1_ISR();
-
+  //Seleccionar número de timer, Prescaler y Flag
+  timer0= timerBegin(0,80,true);
+  //Definimos función de ISR
+  timerAttachInterrupt(timer0, &Timer0_ISR, true);
+  //Definimos alarma y reload 
+  timerAlarmWrite(timer0, 10000, false);
+  //Habilitamos el timer
+  timerAlarmEnable(timer0);
+  void IRAM_ATTR B1_ISR();
+}
 //Hacer que incremente y decremente el contador
 void IRAM_ATTR Timer0_ISR(){
     contador_T++;
@@ -118,37 +313,36 @@ void IRAM_ATTR Timer0_ISR(){
 //Establecemos interrupciones de botón 
 //Establecemos función de acción del boton de suma
 void IRAM_ATTR B1_ISR(){
-unsigned long t_actual = esp_timer_get_time() / 1000; //esp_timer_get_time() devuelve el tiempo actual en microsegundos desde que el microcontrolador comenzó a ejecutarse
-if ((t_actual - bot1_lF) > t_rebote) {
- portEnter_Critical_ISR(&mux);//Entramos a la sección crítica
- contador_B++;
- if (contador_B > 15) {
-      contadorBot = 0;
- }
-}
-unsigned long bot1_lF= t_actual; 
-portExit_Critical_ISR(&mux);//Salimos de la sección crítica 
+  unsigned long t_actual = esp_timer_get_time() / 1000; //esp_timer_get_time() devuelve el tiempo actual en microsegundos desde que el microcontrolador comenzó a ejecutarse
+  if ((t_actual - bot1_lF) > t_rebote_bot1) {
+  portENTER_CRITICAL_ISR(&mux);//Entramos a la sección crítica
+  contador_B++;
+  if (contador_B > 15) {
+        contador_B = 0;
+  }
+  }
+  unsigned long bot1_lF= t_actual; 
+  portEXIT_CRITICAL_ISR(&mux);//Salimos de la sección crítica 
 }
 //Establecemos función de acción del boton de resta
 void IRAM_ATTR B2_ISR(){
-unsigned long t_actual = esp_timer_get_time() / 1000; //esp_timer_get_time() devuelve el tiempo actual en microsegundos desde que el microcontrolador comenzó a ejecutarse
-if ((t_actual - bot2_lF) > t_rebote) {
- portEnter_Critical_ISR(&mux);//Entramos a la sección crítica
- if (contador_B > 0) {
-      contador_B--;
- }
-}
-unsigned long bot2_lF= t_actual;
-portExit_Critical_ISR(&mux);//Salimos de la sección crítica 
+  unsigned long t_actual = esp_timer_get_time() / 1000; //esp_timer_get_time() devuelve el tiempo actual en microsegundos desde que el microcontrolador comenzó a ejecutarse
+  if ((t_actual - bot2_lF) > t_rebote_bot2) {
+  portENTER_CRITICAL_ISR(&mux);//Entramos a la sección crítica
+  if (contador_B > 0) {
+        contador_B--;
+  }
+  }
+  unsigned long bot2_lF= t_actual;
+  portEXIT_CRITICAL_ISR(&mux);//Salimos de la sección crítica 
 }
 //Establecemos función de acción del boton de reinicio de contador de timer 
 void IRAM_ATTR B3_ISR(){
-unsigned long t_actual = esp_timer_get_time() / 1000; //esp_timer_get_time() devuelve el tiempo actual en microsegundos desde que el microcontrolador comenzó a ejecutarse
-if ((t_actual - bot3_lF) > t_rebote) {
- portEnter_Critical_ISR(&mux);//Entramos a la sección crítica
-      contador_T=0;
+  unsigned long t_actual = esp_timer_get_time() / 1000; //esp_timer_get_time() devuelve el tiempo actual en microsegundos desde que el microcontrolador comenzó a ejecutarse
+  if ((t_actual - bot3_lF) > t_rebote_bot3) {
+  portENTER_CRITICAL_ISR(&mux);//Entramos a la sección crítica
+        contador_T=0;
+  }
+  unsigned long bot3_lF= t_actual;
+  portEXIT_CRITICAL_ISR(&mux);//Salimos de la sección crítica 
 }
-unsigned long bot3_lF= t_actual;
-portExit_Critical_ISR(&mux);//Salimos de la sección crítica 
-}
-
